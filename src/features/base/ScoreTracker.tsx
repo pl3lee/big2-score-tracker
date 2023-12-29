@@ -3,6 +3,9 @@ import * as stylex from '@stylexjs/stylex';
 import { FaPlus, FaTrophy } from 'react-icons/fa';
 import { useReactToPrint } from 'react-to-print';
 import { FiPrinter } from 'react-icons/fi';
+import { useLanguageStore } from '../../App';
+import { translations } from '../../utils/translations';
+
 
 type Scores = {
     player1Score: number;
@@ -29,9 +32,14 @@ const styles = stylex.create({
         display: 'flex',
         flexDirection: 'column',
         width: '100%',
+        maxWidth: '1920px',
         justifyContent: 'flex-start',
         alignItems: 'center',
-        padding: '5rem',
+        padding: {
+            '@media (max-width: 768px)': '0rem',
+            '@media (min-width: 768px)': '5rem',
+        },
+
     },
     printButton: {
         border: 'none',
@@ -150,7 +158,10 @@ const styles = stylex.create({
     },
     doubleTripleScoreContainer: {
         display: 'flex',
-        flexDirection: 'row',
+        flexDirection: {
+            '@media (max-width: 768px)': 'column',
+            '@media (min-width: 768px)': 'row',
+        },
         gap: '3rem',
         justifyContent: 'center',
         alignItems: 'center',
@@ -413,7 +424,7 @@ const DoubleTripleScore = ({
     return (
         <div {...stylex.props(styles.doubleTripleScoreContainer)}>
             <div {...stylex.props(styles.labelInputGroup)}>
-                <label>Remaining Cards for Doubling</label>
+                <label>{translations[useLanguageStore().language].remainingDouble}</label>
                 <input
                     {...stylex.props(styles.input)}
                     value={startingDoublingScore}
@@ -442,7 +453,7 @@ const DoubleTripleScore = ({
                 />
             </div>
             <div {...stylex.props(styles.labelInputGroup)}>
-                <label>Remaining Cards for Tripling</label>
+                <label>{translations[useLanguageStore().language].remainingTriple}</label>
                 <input
                     {...stylex.props(styles.input)}
                     value={startingTriplingScore}
@@ -476,6 +487,7 @@ const DoubleTripleScore = ({
 
 const ScoresTable = () => {
     const componentRef = useRef(null);
+    const { language, setLanguage } = useLanguageStore();
 
     const handlePrint = useReactToPrint({
         content: () => componentRef.current,
@@ -484,14 +496,14 @@ const ScoresTable = () => {
     return (
         <div {...stylex.props(styles.printWrapper)}>
             <button onClick={handlePrint} {...stylex.props(styles.printButton)}>
-                <FiPrinter /> Print this out!
+                <FiPrinter /> {translations[language].print}
             </button>
             <div
                 {...stylex.props(styles.mainSectionContainer)}
                 ref={componentRef}
             >
                 <div {...stylex.props(styles.mainSectionHeaderContainer)}>
-                    <h1 {...stylex.props(styles.mainSectionHeader)}>Scores</h1>
+                    <h1 {...stylex.props(styles.mainSectionHeader)}>{translations[language].score}</h1>
                     <div {...stylex.props(styles.dateContainer)}>
                         {date.toISOString().split('T')[0]}
                     </div>
@@ -611,10 +623,10 @@ const RemainingCardsTable = () => {
         <div {...stylex.props(styles.mainSectionContainer)}>
             <div {...stylex.props(styles.mainSectionHeaderContainer)}>
                 <h1 {...stylex.props(styles.mainSectionHeader)}>
-                    Remaining Cards
+                    {translations[useLanguageStore().language].remainingCards}
                 </h1>
                 <div {...stylex.props(styles.datePickerGroupContainer)}>
-                    <label>Date</label>
+                    <label>{translations[useLanguageStore().language].date}</label>
                     <input
                         type="date"
                         value={date.toISOString().split('T')[0]}
@@ -743,7 +755,7 @@ const RemainingCardsTable = () => {
                                 ]);
                             }}
                         >
-                            <FaPlus /> <strong>Add Round</strong>
+                            <FaPlus /> <strong>{translations[useLanguageStore().language].addRound}</strong>
                         </button>
                     </td>
                 </tr>
