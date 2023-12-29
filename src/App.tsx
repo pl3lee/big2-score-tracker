@@ -1,7 +1,7 @@
 import { ScoreTracker } from "./features/base/ScoreTracker";
 
 function App() {
-    return <div className="flex justify-center"><ScoreTracker /></div>;
+    return <div><ScoreTracker /></div>;
 }
 
 export default App;
