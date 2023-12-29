@@ -1,7 +1,8 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useState, useRef } from 'react';
 import * as stylex from '@stylexjs/stylex';
-import { FaEdit, FaPlus, FaTrophy } from 'react-icons/fa';
-import { breakpoints } from '../../utils/breakpoints';
+import { FaPlus, FaTrophy } from 'react-icons/fa';
+import { useReactToPrint } from 'react-to-print';
+import { FiPrinter } from 'react-icons/fi';
 
 type Scores = {
     player1Score: number;
@@ -32,11 +33,34 @@ const styles = stylex.create({
         alignItems: 'center',
         padding: '5rem',
     },
+    printButton: {
+        border: 'none',
+        backgroundColor: 'green',
+        cursor: 'pointer',
+        padding: '1rem',
+        width: '100%',
+        borderRadius: '5px',
+        color: 'white',
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: '0.5rem',
+        fontSize: '1rem',
+    },
     dateContainer: {
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    printWrapper: {
+        display: 'flex',
+        width: '100%',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: '20px',
     },
     tablesContainer: {
         display: 'flex',
@@ -61,7 +85,10 @@ const styles = stylex.create({
         width: '100%',
         justifyContent: 'flex-start',
         alignItems: 'center',
-        boxShadow: '0px 0px 10px 0px rgba(0,0,0,0.75)',
+        boxShadow: {
+            default: '0px 0px 10px 0px rgba(0,0,0,0.75)',
+            '@media print': 'none',
+        },
         borderRadius: '9px',
     },
     mainSectionHeader: {
@@ -168,6 +195,7 @@ const styles = stylex.create({
         display: {
             '@media (max-width: 1000px)': 'flex',
             '@media (min-width: 1000px)': 'grid',
+            '@media print': 'grid',
         },
         flexDirection: 'column',
         gridTemplateColumns: '1fr 1fr 1fr',
@@ -447,88 +475,103 @@ const DoubleTripleScore = ({
 };
 
 const ScoresTable = () => {
+    const componentRef = useRef(null);
+
+    const handlePrint = useReactToPrint({
+        content: () => componentRef.current,
+    });
     const { players, scoresList, date } = useContext(ScoreTrackerContext);
     return (
-        <div {...stylex.props(styles.mainSectionContainer)}>
-            <div {...stylex.props(styles.mainSectionHeaderContainer)}>
-                <h1 {...stylex.props(styles.mainSectionHeader)}>Scores</h1>
-                <div {...stylex.props(styles.dateContainer)}>{date.toISOString().split('T')[0]}</div>
-            </div>
+        <div {...stylex.props(styles.printWrapper)}>
+            <button onClick={handlePrint} {...stylex.props(styles.printButton)}>
+                <FiPrinter /> Print this out!
+            </button>
+            <div
+                {...stylex.props(styles.mainSectionContainer)}
+                ref={componentRef}
+            >
+                <div {...stylex.props(styles.mainSectionHeaderContainer)}>
+                    <h1 {...stylex.props(styles.mainSectionHeader)}>Scores</h1>
+                    <div {...stylex.props(styles.dateContainer)}>
+                        {date.toISOString().split('T')[0]}
+                    </div>
+                </div>
 
-            <table {...stylex.props(styles.table)}>
-                <tr {...stylex.props(styles.tableRow, styles.tableHead)}>
-                    {Object.keys(players).map((player, index) => (
-                        <th
-                            key={index}
-                            {...stylex.props(
-                                styles.inputContainer,
-                                styles.tableCell,
-                                styles.tableHeadCell,
-                            )}
-                        >
-                            {players[player as keyof Players]}
-                        </th>
-                    ))}
-                </tr>
-                {scoresList.map((scores, index) => {
-                    let won = 0;
-                    if (index === 0) {
-                        if (scores.player1Score === 0) won = 1;
-                        else if (scores.player2Score === 0) won = 2;
-                        else if (scores.player3Score === 0) won = 3;
-                        else if (scores.player4Score === 0) won = 4;
-                    } else {
-                        if (
-                            scores.player1Score ===
-                            scoresList[index - 1].player1Score
-                        )
-                            won = 1;
-                        else if (
-                            scores.player2Score ===
-                            scoresList[index - 1].player2Score
-                        )
-                            won = 2;
-                        else if (
-                            scores.player3Score ===
-                            scoresList[index - 1].player3Score
-                        )
-                            won = 3;
-                        else if (
-                            scores.player4Score ===
-                            scoresList[index - 1].player4Score
-                        )
-                            won = 4;
-                    }
-                    return (
-                        <tr key={index} {...stylex.props(styles.tableRow)}>
-                            <td {...stylex.props(styles.tableCell)}>
-                                {won === 1 && (
-                                    <FaTrophy style={{ color: 'gold' }} />
+                <table {...stylex.props(styles.table)}>
+                    <tr {...stylex.props(styles.tableRow, styles.tableHead)}>
+                        {Object.keys(players).map((player, index) => (
+                            <th
+                                key={index}
+                                {...stylex.props(
+                                    styles.inputContainer,
+                                    styles.tableCell,
+                                    styles.tableHeadCell,
                                 )}
-                                {scores.player1Score}
-                            </td>
-                            <td {...stylex.props(styles.tableCell)}>
-                                {won === 2 && (
-                                    <FaTrophy style={{ color: 'gold' }} />
-                                )}
-                                {scores.player2Score}
-                            </td>
-                            <td {...stylex.props(styles.tableCell)}>
-                                {won === 3 && (
-                                    <FaTrophy style={{ color: 'gold' }} />
-                                )}
-                                {scores.player3Score}
-                            </td>
-                            <td {...stylex.props(styles.tableCell)}>
-                                {won === 4 && (
-                                    <FaTrophy style={{ color: 'gold' }} />
-                                )}
-                                {scores.player4Score}
-                            </td>
-                        </tr>
-                    );
-                })}
-            </table>
+                            >
+                                {players[player as keyof Players]}
+                            </th>
+                        ))}
+                    </tr>
+                    {scoresList.map((scores, index) => {
+                        let won = 0;
+                        if (index === 0) {
+                            if (scores.player1Score === 0) won = 1;
+                            else if (scores.player2Score === 0) won = 2;
+                            else if (scores.player3Score === 0) won = 3;
+                            else if (scores.player4Score === 0) won = 4;
+                        } else {
+                            if (
+                                scores.player1Score ===
+                                scoresList[index - 1].player1Score
+                            )
+                                won = 1;
+                            else if (
+                                scores.player2Score ===
+                                scoresList[index - 1].player2Score
+                            )
+                                won = 2;
+                            else if (
+                                scores.player3Score ===
+                                scoresList[index - 1].player3Score
+                            )
+                                won = 3;
+                            else if (
+                                scores.player4Score ===
+                                scoresList[index - 1].player4Score
+                            )
+                                won = 4;
+                        }
+                        return (
+                            <tr key={index} {...stylex.props(styles.tableRow)}>
+                                <td {...stylex.props(styles.tableCell)}>
+                                    {won === 1 && (
+                                        <FaTrophy style={{ color: 'gold' }} />
+                                    )}
+                                    {scores.player1Score}
+                                </td>
+                                <td {...stylex.props(styles.tableCell)}>
+                                    {won === 2 && (
+                                        <FaTrophy style={{ color: 'gold' }} />
+                                    )}
+                                    {scores.player2Score}
+                                </td>
+                                <td {...stylex.props(styles.tableCell)}>
+                                    {won === 3 && (
+                                        <FaTrophy style={{ color: 'gold' }} />
+                                    )}
+                                    {scores.player3Score}
+                                </td>
+                                <td {...stylex.props(styles.tableCell)}>
+                                    {won === 4 && (
+                                        <FaTrophy style={{ color: 'gold' }} />
+                                    )}
+                                    {scores.player4Score}
+                                </td>
+                            </tr>
+                        );
+                    })}
+                </table>
+            </div>
         </div>
     );
 };
