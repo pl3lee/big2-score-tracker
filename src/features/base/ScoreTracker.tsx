@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { FaEdit, FaPlus } from 'react-icons/fa';
 import { breakpoints } from '../../utils/breakpoints';
@@ -67,9 +67,23 @@ const styles = stylex.create({
         flexDirection: 'row',
         justifyContent: 'center',
     },
+    addRowContainer: {
+        textAlign: 'center',
+    },
+    doubleTripleScoreContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        gap: '3rem',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%',
+        padding: '1rem',
+    },
 });
 
 export const ScoreTracker = () => {
+    const [startingDoublingScore, setStartingDoublingScore] = useState(8);
+    const [startingTriplingScore, setStartingTriplingScore] = useState(13);
     const [players, setPlayers] = useState<Players>({
         player1: 'A',
         player2: 'B',
@@ -113,6 +127,159 @@ export const ScoreTracker = () => {
         });
     });
 
+    return (
+        <div {...stylex.props(styles.root)}>
+            <DoubleTripleScore
+                startingDoublingScore={startingDoublingScore}
+                setStartingDoublingScore={setStartingDoublingScore}
+                startingTriplingScore={startingTriplingScore}
+                setStartingTriplingScore={setStartingTriplingScore}
+            />
+            <ScoresTable
+                players={players}
+                setPlayers={setPlayers}
+                scoresList={scoresList}
+            />
+            <RemainingCardsTable
+                players={players}
+                setPlayers={setPlayers}
+                remainingCardsList={remainingCardsList}
+                setRemainingCardsList={setRemainingCardsList}
+            />
+        </div>
+    );
+};
+
+const DoubleTripleScore = ({
+    startingDoublingScore,
+    setStartingDoublingScore,
+    startingTriplingScore,
+    setStartingTriplingScore,
+}: {
+    startingDoublingScore: number;
+    setStartingDoublingScore: React.Dispatch<React.SetStateAction<number>>;
+    startingTriplingScore: number;
+    setStartingTriplingScore: React.Dispatch<React.SetStateAction<number>>;
+}) => {
+    return (
+        <div {...stylex.props(styles.doubleTripleScoreContainer)}>
+            <input
+                value={startingDoublingScore}
+                onChange={e => {
+                    setStartingDoublingScore(prevStartingDoublingScore => {
+                        if (isNaN(Number(e.target.value))) {
+                            return 14;
+                        } else if (Number(e.target.value) > 14) {
+                            return 14;
+                        } else if (
+                            Number(e.target.value) === startingTriplingScore &&
+                            Number(e.target.value) !== 14
+                        ) {
+                            setStartingTriplingScore(
+                                Number(e.target.value) + 1,
+                            );
+                            return Number(e.target.value);
+                        } else {
+                            return Number(e.target.value);
+                        }
+                    });
+                }}
+            />
+            <input
+                value={startingTriplingScore}
+                onChange={e => {
+                    setStartingTriplingScore(prevStartingTriplingScore => {
+                        if (isNaN(Number(e.target.value))) {
+                            return 14;
+                        } else if (Number(e.target.value) > 14) {
+                            return 14;
+                        } else if (
+                            Number(e.target.value) === startingDoublingScore &&
+                            Number(e.target.value) !== 14
+                        ) {
+                            setStartingDoublingScore(
+                                Number(e.target.value) - 1,
+                            );
+                            return Number(e.target.value);
+                        } else {
+                            return Number(e.target.value);
+                        }
+                    });
+                }}
+            />
+        </div>
+    );
+};
+
+const ScoresTable = ({
+    players,
+    setPlayers,
+    scoresList,
+}: {
+    players: Players;
+    setPlayers: React.Dispatch<React.SetStateAction<Players>>;
+    scoresList: Scores[];
+}) => {
+    return (
+        <div {...stylex.props(styles.mainSectionContainer)}>
+            <h1 {...stylex.props(styles.mainSectionHeader)}>Scores</h1>
+            <table>
+                <tr>
+                    {Object.keys(players).map((player, index) => (
+                        <th key={index}>
+                            <input
+                                {...stylex.props(
+                                    styles.tableCell,
+                                    styles.tableHeadCell,
+                                )}
+                                type="text"
+                                value={players[player as keyof Players]}
+                                onChange={e => {
+                                    const newPlayers = { ...players };
+                                    newPlayers[player as keyof Players] =
+                                        e.target.value;
+                                    setPlayers(newPlayers);
+                                }}
+                            />
+                        </th>
+                    ))}
+                </tr>
+                {scoresList.map((scores, index) => {
+                    return (
+                        <tr key={index}>
+                            <td {...stylex.props(styles.tableCell)}>
+                                {scores.player1Score}
+                            </td>
+                            <td {...stylex.props(styles.tableCell)}>
+                                {scores.player2Score}
+                            </td>
+                            <td {...stylex.props(styles.tableCell)}>
+                                {scores.player3Score}
+                            </td>
+                            <td {...stylex.props(styles.tableCell)}>
+                                {scores.player4Score}
+                            </td>
+                        </tr>
+                    );
+                })}
+            </table>
+        </div>
+    );
+};
+
+const RemainingCardsTable = ({
+    players,
+    setPlayers,
+    remainingCardsList,
+    setRemainingCardsList,
+}: {
+    players: Players;
+    setPlayers: React.Dispatch<React.SetStateAction<Players>>;
+    remainingCardsList: RemainingCards[];
+    setRemainingCardsList: React.Dispatch<
+        React.SetStateAction<RemainingCards[]>
+    >;
+}) => {
     const handleRemainingCardsChange = (
         event: React.ChangeEvent<HTMLInputElement>,
         player: number,
@@ -124,7 +291,11 @@ export const ScoreTracker = () => {
         };
         newRemainingCards[
             `player${player}RemainingCards` as keyof RemainingCards
-        ] = isNaN(Number(event.target.value)) ? 0 : Number(event.target.value);
+        ] = isNaN(Number(event.target.value))
+            ? 0
+            : Number(event.target.value) > 13
+              ? 13
+              : Number(event.target.value);
         setRemainingCardsList(prevRemainingCardsList => {
             const newRemainingCardsList = [...prevRemainingCardsList];
             newRemainingCardsList[index] = newRemainingCards;
@@ -132,172 +303,114 @@ export const ScoreTracker = () => {
         });
     };
     return (
-        <div {...stylex.props(styles.root)}>
-            <div {...stylex.props(styles.mainSectionContainer)}>
-                <h1 {...stylex.props(styles.mainSectionHeader)}>Scores</h1>
-                <table>
-                    <tr>
-                        {Object.keys(players).map((player, index) => (
-                            <th key={index}>
-                                <input
-                                    {...stylex.props(
-                                        styles.tableCell,
-                                        styles.tableHeadCell,
-                                    )}
-                                    type="text"
-                                    value={players[player as keyof Players]}
-                                    onChange={e => {
-                                        const newPlayers = { ...players };
-                                        newPlayers[player as keyof Players] =
-                                            e.target.value;
-                                        setPlayers(newPlayers);
-                                    }}
-                                />
-                            </th>
-                        ))}
-                    </tr>
-                    {scoresList.map((scores, index) => {
-                        return (
-                            <tr key={index}>
-                                <td {...stylex.props(styles.tableCell)}>
-                                    {scores.player1Score}
-                                </td>
-                                <td {...stylex.props(styles.tableCell)}>
-                                    {scores.player2Score}
-                                </td>
-                                <td {...stylex.props(styles.tableCell)}>
-                                    {scores.player3Score}
-                                </td>
-                                <td {...stylex.props(styles.tableCell)}>
-                                    {scores.player4Score}
-                                </td>
-                            </tr>
-                        );
-                    })}
-                </table>
-            </div>
-            <div {...stylex.props(styles.mainSectionContainer)}>
-                <h1 {...stylex.props(styles.mainSectionHeader)}>
-                    Remaining Cards
-                </h1>
-                <table>
-                    <tr {...stylex.props(styles.tableRow)}>
-                        {Object.keys(players).map((player, index) => (
-                            <th
-                                key={index}
-                                {...stylex.props(styles.inputContainer)}
-                            >
-                                <input
-                                    {...stylex.props(
-                                        styles.tableCell,
-                                        styles.tableHeadCell,
-                                    )}
-                                    type="text"
-                                    value={players[player as keyof Players]}
-                                    onChange={e => {
-                                        const newPlayers = { ...players };
-                                        newPlayers[player as keyof Players] =
-                                            e.target.value;
-                                        setPlayers(newPlayers);
-                                    }}
-                                />
-                            </th>
-                        ))}
-                    </tr>
-                    {remainingCardsList.map((remainingCards, index) => {
-                        return (
-                            <tr key={index} {...stylex.props(styles.tableRow)}>
-                                <td {...stylex.props(styles.inputContainer)}>
-                                    <input
-                                        {...stylex.props(styles.tableCell)}
-                                        value={
-                                            remainingCards.player1RemainingCards
-                                        }
-                                        onChange={e => {
-                                            handleRemainingCardsChange(
-                                                e,
-                                                1,
-                                                remainingCards,
-                                                index,
-                                            );
-                                        }}
-                                    />
-                                </td>
-                                <td {...stylex.props(styles.inputContainer)}>
-                                    <input
-                                        {...stylex.props(styles.tableCell)}
-                                        value={
-                                            remainingCards.player2RemainingCards
-                                        }
-                                        onChange={e => {
-                                            handleRemainingCardsChange(
-                                                e,
-                                                2,
-                                                remainingCards,
-                                                index,
-                                            );
-                                        }}
-                                    />
-                                </td>
-                                <td {...stylex.props(styles.inputContainer)}>
-                                    <input
-                                        {...stylex.props(styles.tableCell)}
-                                        value={
-                                            remainingCards.player3RemainingCards
-                                        }
-                                        onChange={e => {
-                                            handleRemainingCardsChange(
-                                                e,
-                                                3,
-                                                remainingCards,
-                                                index,
-                                            );
-                                        }}
-                                    />
-                                </td>
-                                <td {...stylex.props(styles.inputContainer)}>
-                                    <input
-                                        {...stylex.props(styles.tableCell)}
-                                        value={
-                                            remainingCards.player4RemainingCards
-                                        }
-                                        onChange={e => {
-                                            handleRemainingCardsChange(
-                                                e,
-                                                4,
-                                                remainingCards,
-                                                index,
-                                            );
-                                        }}
-                                    />
-                                </td>
-                            </tr>
-                        );
-                    })}
-                    <tr>
-                        <td
-                            {...stylex.props(styles.addRowContainer)}
-                            colSpan={4}
+        <div {...stylex.props(styles.mainSectionContainer)}>
+            <h1 {...stylex.props(styles.mainSectionHeader)}>Remaining Cards</h1>
+            <table>
+                <tr {...stylex.props(styles.tableRow)}>
+                    {Object.keys(players).map((player, index) => (
+                        <th
+                            key={index}
+                            {...stylex.props(styles.inputContainer)}
                         >
-                            <button
-                                onClick={() => {
-                                    setRemainingCardsList([
-                                        ...remainingCardsList,
-                                        {
-                                            player1RemainingCards: 0,
-                                            player2RemainingCards: 0,
-                                            player3RemainingCards: 0,
-                                            player4RemainingCards: 0,
-                                        },
-                                    ]);
+                            <input
+                                {...stylex.props(
+                                    styles.tableCell,
+                                    styles.tableHeadCell,
+                                )}
+                                type="text"
+                                value={players[player as keyof Players]}
+                                onChange={e => {
+                                    const newPlayers = { ...players };
+                                    newPlayers[player as keyof Players] =
+                                        e.target.value;
+                                    setPlayers(newPlayers);
                                 }}
-                            >
-                                <FaPlus />
-                            </button>
-                        </td>
-                    </tr>
-                </table>
-            </div>
+                            />
+                        </th>
+                    ))}
+                </tr>
+                {remainingCardsList.map((remainingCards, index) => {
+                    return (
+                        <tr key={index} {...stylex.props(styles.tableRow)}>
+                            <td {...stylex.props(styles.inputContainer)}>
+                                <input
+                                    {...stylex.props(styles.tableCell)}
+                                    value={remainingCards.player1RemainingCards}
+                                    onChange={e => {
+                                        handleRemainingCardsChange(
+                                            e,
+                                            1,
+                                            remainingCards,
+                                            index,
+                                        );
+                                    }}
+                                />
+                            </td>
+                            <td {...stylex.props(styles.inputContainer)}>
+                                <input
+                                    {...stylex.props(styles.tableCell)}
+                                    value={remainingCards.player2RemainingCards}
+                                    onChange={e => {
+                                        handleRemainingCardsChange(
+                                            e,
+                                            2,
+                                            remainingCards,
+                                            index,
+                                        );
+                                    }}
+                                />
+                            </td>
+                            <td {...stylex.props(styles.inputContainer)}>
+                                <input
+                                    {...stylex.props(styles.tableCell)}
+                                    value={remainingCards.player3RemainingCards}
+                                    onChange={e => {
+                                        handleRemainingCardsChange(
+                                            e,
+                                            3,
+                                            remainingCards,
+                                            index,
+                                        );
+                                    }}
+                                />
+                            </td>
+                            <td {...stylex.props(styles.inputContainer)}>
+                                <input
+                                    {...stylex.props(styles.tableCell)}
+                                    value={remainingCards.player4RemainingCards}
+                                    onChange={e => {
+                                        handleRemainingCardsChange(
+                                            e,
+                                            4,
+                                            remainingCards,
+                                            index,
+                                        );
+                                    }}
+                                />
+                            </td>
+                        </tr>
+                    );
+                })}
+                <tr>
+                    <td {...stylex.props(styles.addRowContainer)} colSpan={4}>
+                        <button
+                            onClick={() => {
+                                setRemainingCardsList([
+                                    ...remainingCardsList,
+                                    {
+                                        player1RemainingCards: 0,
+                                        player2RemainingCards: 0,
+                                        player3RemainingCards: 0,
+                                        player4RemainingCards: 0,
+                                    },
+                                ]);
+                            }}
+                        >
+                            <FaPlus />
+                        </button>
+                    </td>
+                </tr>
+            </table>
         </div>
     );
 };
