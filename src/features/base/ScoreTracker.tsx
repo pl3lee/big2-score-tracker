@@ -421,10 +421,12 @@ const DoubleTripleScore = ({
     startingTriplingScore: number;
     setStartingTriplingScore: React.Dispatch<React.SetStateAction<number>>;
 }) => {
+    const { language } = useLanguageStore();
     return (
+
         <div {...stylex.props(styles.doubleTripleScoreContainer)}>
             <div {...stylex.props(styles.labelInputGroup)}>
-                <label>{translations[useLanguageStore().language].remainingDouble}</label>
+                <label>{translations[language as keyof typeof translations].remainingDouble}</label>
                 <input
                     {...stylex.props(styles.input)}
                     value={startingDoublingScore}
@@ -453,7 +455,7 @@ const DoubleTripleScore = ({
                 />
             </div>
             <div {...stylex.props(styles.labelInputGroup)}>
-                <label>{translations[useLanguageStore().language].remainingTriple}</label>
+                <label>{translations[language as keyof typeof translations].remainingTriple}</label>
                 <input
                     {...stylex.props(styles.input)}
                     value={startingTriplingScore}
@@ -487,7 +489,7 @@ const DoubleTripleScore = ({
 
 const ScoresTable = () => {
     const componentRef = useRef(null);
-    const { language, setLanguage } = useLanguageStore();
+    const { language } = useLanguageStore();
 
     const handlePrint = useReactToPrint({
         content: () => componentRef.current,
@@ -496,14 +498,14 @@ const ScoresTable = () => {
     return (
         <div {...stylex.props(styles.printWrapper)}>
             <button onClick={handlePrint} {...stylex.props(styles.printButton)}>
-                <FiPrinter /> {translations[language].print}
+                <FiPrinter /> {translations[language as keyof typeof translations].print}
             </button>
             <div
                 {...stylex.props(styles.mainSectionContainer)}
                 ref={componentRef}
             >
                 <div {...stylex.props(styles.mainSectionHeaderContainer)}>
-                    <h1 {...stylex.props(styles.mainSectionHeader)}>{translations[language].score}</h1>
+                    <h1 {...stylex.props(styles.mainSectionHeader)}>{translations[language as keyof typeof translations].score}</h1>
                     <div {...stylex.props(styles.dateContainer)}>
                         {date.toISOString().split('T')[0]}
                     </div>
@@ -619,14 +621,15 @@ const RemainingCardsTable = () => {
             return newRemainingCardsList;
         });
     };
+    const { language } = useLanguageStore();
     return (
         <div {...stylex.props(styles.mainSectionContainer)}>
             <div {...stylex.props(styles.mainSectionHeaderContainer)}>
                 <h1 {...stylex.props(styles.mainSectionHeader)}>
-                    {translations[useLanguageStore().language].remainingCards}
+                    {translations[language as keyof typeof translations].remainingCards}
                 </h1>
                 <div {...stylex.props(styles.datePickerGroupContainer)}>
-                    <label>{translations[useLanguageStore().language].date}</label>
+                    <label>{translations[language as keyof typeof translations].date}</label>
                     <input
                         type="date"
                         value={date.toISOString().split('T')[0]}
@@ -755,7 +758,7 @@ const RemainingCardsTable = () => {
                                 ]);
                             }}
                         >
-                            <FaPlus /> <strong>{translations[useLanguageStore().language].addRound}</strong>
+                            <FaPlus /> <strong>{translations[language as keyof typeof translations].addRound}</strong>
                         </button>
                     </td>
                 </tr>

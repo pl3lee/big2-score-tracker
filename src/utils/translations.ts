@@ -1,5 +1,5 @@
 export const translations = {
-    en: {
+    "en": {
         name: "Big 2 Score Tracker",
         score: "Score",
         print: "Print Result",
@@ -9,7 +9,7 @@ export const translations = {
         date: "Date",
         addRound: "Add Round",
     },
-    zh: {
+    "zh": {
         name: "鋤大計分器",
         score: "得分",
         print: "列印結果",

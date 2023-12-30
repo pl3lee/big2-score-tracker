@@ -2,7 +2,13 @@ import { ScoreTracker } from './features/base/ScoreTracker';
 import { create } from 'zustand';
 import * as stylex from '@stylexjs/stylex';
 
-export const useLanguageStore = create(set => ({
+type LanguageStore = {
+    language: string;
+    setLanguage: (language: string) => void;
+};
+
+
+export const useLanguageStore = create<LanguageStore>()(set => ({
     language: 'zh',
     setLanguage: (language: string) => set({ language }),
 }));
@@ -29,7 +35,7 @@ const styles = stylex.create({
 });
 
 function App() {
-    const { language, setLanguage } = useLanguageStore();
+    const { setLanguage } = useLanguageStore();
     return (
         <div {...stylex.props(styles.root)}>
             <div {...stylex.props(styles.languageContainer)}>
