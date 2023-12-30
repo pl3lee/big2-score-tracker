@@ -428,8 +428,9 @@ const DoubleTripleScore = ({
             <div {...stylex.props(styles.labelInputGroup)}>
                 <label>{translations[language as keyof typeof translations].remainingDouble}</label>
                 <input
+                    type='number'
                     {...stylex.props(styles.input)}
-                    value={startingDoublingScore}
+                    value={startingDoublingScore.toString()}
                     onChange={e => {
                         setStartingDoublingScore(() => {
                             if (
@@ -457,8 +458,9 @@ const DoubleTripleScore = ({
             <div {...stylex.props(styles.labelInputGroup)}>
                 <label>{translations[language as keyof typeof translations].remainingTriple}</label>
                 <input
+                    type='number'
                     {...stylex.props(styles.input)}
-                    value={startingTriplingScore}
+                    value={startingTriplingScore.toString()}
                     onChange={e => {
                         setStartingTriplingScore(() => {
                             if (
@@ -673,11 +675,12 @@ const RemainingCardsTable = () => {
                         <tr key={index} {...stylex.props(styles.tableRow)}>
                             <td {...stylex.props(styles.inputContainer)}>
                                 <input
+                                    type='number'
                                     {...stylex.props(
                                         styles.tableCell,
                                         styles.input,
                                     )}
-                                    value={remainingCards.player1RemainingCards}
+                                    value={remainingCards.player1RemainingCards.toString()}
                                     onChange={e => {
                                         handleRemainingCardsChange(
                                             e,
@@ -690,11 +693,12 @@ const RemainingCardsTable = () => {
                             </td>
                             <td {...stylex.props(styles.inputContainer)}>
                                 <input
+                                    type='number'
                                     {...stylex.props(
                                         styles.tableCell,
                                         styles.input,
                                     )}
-                                    value={remainingCards.player2RemainingCards}
+                                    value={remainingCards.player2RemainingCards.toString()}
                                     onChange={e => {
                                         handleRemainingCardsChange(
                                             e,
@@ -707,11 +711,12 @@ const RemainingCardsTable = () => {
                             </td>
                             <td {...stylex.props(styles.inputContainer)}>
                                 <input
+                                    type='number'
                                     {...stylex.props(
                                         styles.tableCell,
                                         styles.input,
                                     )}
-                                    value={remainingCards.player3RemainingCards}
+                                    value={remainingCards.player3RemainingCards.toString()}
                                     onChange={e => {
                                         handleRemainingCardsChange(
                                             e,
@@ -724,11 +729,12 @@ const RemainingCardsTable = () => {
                             </td>
                             <td {...stylex.props(styles.inputContainer)}>
                                 <input
+                                    type='number'
                                     {...stylex.props(
                                         styles.tableCell,
                                         styles.input,
                                     )}
-                                    value={remainingCards.player4RemainingCards}
+                                    value={remainingCards.player4RemainingCards.toString()}
                                     onChange={e => {
                                         handleRemainingCardsChange(
                                             e,
