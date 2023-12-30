@@ -10,7 +10,7 @@ export const translations = {
         addRound: "Add Round",
     },
     "zh": {
-        name: "鋤大計分器",
+        name: "鋤大Dee計分器",
         score: "得分",
         print: "列印結果",
         remainingDouble: "幾張開始炒雙",

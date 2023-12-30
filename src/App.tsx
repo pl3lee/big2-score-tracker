@@ -1,6 +1,8 @@
 import { ScoreTracker } from './features/base/ScoreTracker';
 import { create } from 'zustand';
 import * as stylex from '@stylexjs/stylex';
+import { Helmet } from "react-helmet";
+import { translations } from './utils/translations';
 
 type LanguageStore = {
     language: string;
@@ -35,9 +37,13 @@ const styles = stylex.create({
 });
 
 function App() {
-    const { setLanguage } = useLanguageStore();
+    const { language, setLanguage } = useLanguageStore();
     return (
         <div {...stylex.props(styles.root)}>
+            <Helmet>
+                <meta charSet="utf-8" />
+                <title>{translations[language as keyof typeof translations].name}</title>
+            </Helmet>
             <div {...stylex.props(styles.languageContainer)}>
                 <button {...stylex.props(styles.button)} onClick={() => setLanguage('en')}>English</button>
                 <button {...stylex.props(styles.button)} onClick={() => setLanguage('zh')}>中文</button>
