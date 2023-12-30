@@ -3,6 +3,7 @@ import { create } from 'zustand';
 import * as stylex from '@stylexjs/stylex';
 import { Helmet } from "react-helmet";
 import { translations } from './utils/translations';
+import favicon from './favicon.ico'
 
 type LanguageStore = {
     language: string;
@@ -43,6 +44,7 @@ function App() {
             <Helmet>
                 <meta charSet="utf-8" />
                 <title>{translations[language as keyof typeof translations].name}</title>
+                <link id="favicon" rel="icon" href={favicon} type="image/x-icon" />
             </Helmet>
             <div {...stylex.props(styles.languageContainer)}>
                 <button {...stylex.props(styles.button)} onClick={() => setLanguage('en')}>English</button>
